@@ -1,0 +1,3 @@
+[submodule "tools/cmake/cmake-common-utils"]
+	path = tools/cmake/cmake-common-utils
+	url = https://github.com/malirod/cmake-common-utils.git

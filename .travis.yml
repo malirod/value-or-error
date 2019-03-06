@@ -1,0 +1,22 @@
+sudo: required
+dist: trusty
+language: cpp
+
+services:
+  - docker
+
+branches:
+  only:
+    - master
+    - develop
+
+before_install:
+  - docker build -t travis-build -f tools/Dockerfile .
+
+script:
+  - docker run --rm travis-build tools/checkstyle.sh $TRAVIS_COMMIT_RANGE
+  - docker run --rm travis-build /bin/bash -c "mkdir build-clang-tidy && cd build-clang-tidy && CXX=clang++-7 CC=clang-7 cmake -GNinja .. && ninja clang-tidy"
+  - docker run --rm travis-build /bin/bash -c "mkdir build-clang-debug && cd build-clang-debug && CXX=clang++-7 CC=clang-7 cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .. && ninja && ctest --output-on-failure"
+  - docker run --rm travis-build /bin/bash -c "mkdir build-clang-release && cd build-clang-release && CXX=clang++-7 CC=clang-7 cmake -GNinja -DCMAKE_BUILD_TYPE=Release .. && ninja && ctest --output-on-failure"
+  - docker run --rm travis-build /bin/bash -c "mkdir build-gcc-debug && cd build-gcc-debug && CXX=g++-8 CC=gcc-8 cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .. && ninja && ctest --output-on-failure"
+  - docker run --rm travis-build /bin/bash -c "mkdir build-gcc-release && cd build-gcc-release && CXX=g++-8 CC=gcc-8 cmake -GNinja -DCMAKE_BUILD_TYPE=Release .. && ninja && ctest --output-on-failure"

@@ -1,0 +1,21 @@
+source: https://github.com/danmar/cppcheck
+version: 1.85-release
+build cmd:
+sudo apt install libpcre3-dev
+make SRCDIR=build CFGDIR=cfg HAVE_RULES=yes CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function"
+
+changed:
+fixed odd whitespaces in rules with the following commands
+```
+dos2unix
+sed -i 's/[ \t]*$//' tools/cppcheck/cfg/std.cfg
+sed -i 's/[ \t]*$//' tools/cppcheck/cfg/windows.cfg
+sed -i 's/[ \t]*$//' tools/cppcheck/cfg/bsd.cfg
+sed -i 's/[ \t]*$//' tools/cppcheck/cfg/gnu.cfg
+sed -i 's/[ \t]*$//' tools/cppcheck/cfg/posix.cfg
+```
+
+usage:
+```
+./tools/cppcheck/cppcheck -j $(nproc) --error-exitcode=1 --language=c++ --std=c++11 --std=posix --platform=unix64 --enable=warning,style,performance,portability,information,missingInclude --template='{id}:{file}:{line} {message}' --suppressions-list=tools/cppcheck/suppressions --inline-suppr --inconclusive -Isrc $CPP_FILES
+```
