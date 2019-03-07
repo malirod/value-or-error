@@ -58,7 +58,12 @@ if (BUILD_TESTING)
         "test/enum_util_test.cc"
         "test/db_manager.h"
         "test/db_manager.cc"
-        "test/db_manager_test.cc")
+        "test/db_manager_test.cc"
+        "test/business_service.h"
+        "test/business_service.cc"
+        "test/business_service_test.cc"
+        "test/business_service_error.h"
+        "test/business_service_error.cc")
 
     add_library(${TEST_LIB_NAME} OBJECT ${TEST_SRC_LIST})
     add_library(rms::${TEST_LIB_NAME} ALIAS ${TEST_LIB_NAME})

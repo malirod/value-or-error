@@ -8,14 +8,20 @@
 
 namespace rms {
 
-class DBManager {
+class DBManager;
+
+class BusinessService {
  public:
-  rms::ValueOrError<std::vector<std::string>> get_customers() const;
+  explicit BusinessService(DBManager& db_manager);
+
+  rms::ValueOrError<std::string> get_customer_by_id(uint32_t id) const;
 
   void set_current_error(std::error_code error);
 
  private:
   std::error_code m_current_error;
+
+  rms::DBManager& m_db_manager;
 };
 
 }  // namespace rms
