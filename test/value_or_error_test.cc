@@ -410,18 +410,6 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
     REQUIRE_THROWS_AS(action(), std::logic_error);
   }
 
-  SECTION("Custom finalizer for unhandled error") {
-    bool error_is_not_handled = false;
-    auto action = [&]() {
-      auto finalizer = [&]() { error_is_not_handled = true; };
-      auto result =
-          ErrorOrFoo(std::make_error_code(std::errc::no_such_file_or_directory),
-                     std::move(finalizer));
-    };
-    action();
-    REQUIRE(error_is_not_handled);
-  }
-
   SECTION("Handled error via operator bool. Case 1.") {
     auto result = ErrorOrFoo(std::error_code());
     if (!result) {
@@ -439,6 +427,19 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
     } else {
       REQUIRE(false);  // not expected to go this way
     }
+  }
+
+  /*
+  SECTION("Custom finalizer for unhandled error") {
+    bool error_is_not_handled = false;
+    auto action = [&]() {
+      auto finalizer = [&]() { error_is_not_handled = true; };
+      auto result =
+          ErrorOrFoo(std::make_error_code(std::errc::no_such_file_or_directory),
+                     std::move(finalizer));
+    };
+    action();
+    REQUIRE(error_is_not_handled);
   }
 
   SECTION("Unhandled error unignored") {
@@ -468,4 +469,5 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
     action();
     REQUIRE(!error_is_not_handled);
   }
+  */
 }

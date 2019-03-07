@@ -27,5 +27,5 @@ rms::ValueOrError<std::string> rms::BusinessService::get_customer_by_id(
 }
 
 void rms::BusinessService::set_current_error(std::error_code error) {
-  m_current_error = std::move(error);
+  m_current_error = error;
 }

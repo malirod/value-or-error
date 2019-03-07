@@ -11,5 +11,5 @@ rms::ValueOrError<std::vector<std::string>> rms::DBManager::get_customers()
 }
 
 void rms::DBManager::set_current_error(std::error_code error) {
-  m_current_error = std::move(error);
+  m_current_error = error;
 }

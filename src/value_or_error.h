@@ -27,7 +27,6 @@ class ValueOrError {
   using value_type = T;
   using storage_type =
       boost::variant<boost::blank, std::error_code, value_type>;
-  using finalizer_type = std::function<void()>;
 
  public:
   template <typename E,
@@ -36,29 +35,11 @@ class ValueOrError {
                 std::is_error_condition_enum<E>::value>::type* = nullptr>
   // cppcheck-suppress noExplicitConstructor
   ValueOrError(E error_code)  // NOLINT
-      : m_has_error(true),
-        m_storage(make_error_code(error_code)),
-        m_finalizer(default_finalizer) {}
+      : m_has_error(true), m_storage(make_error_code(error_code)) {}
 
   // cppcheck-suppress noExplicitConstructor
   ValueOrError(std::error_code error_code)  // NOLINT
-      : m_has_error(true),
-        m_storage(std::move(error_code)),
-        m_finalizer(default_finalizer) {}
-
-  template <typename E,
-            typename std::enable_if<
-                std::is_error_code_enum<E>::value ||
-                std::is_error_condition_enum<E>::value>::type* = nullptr>
-  ValueOrError(E error_code, finalizer_type finalizer)
-      : m_has_error(true),
-        m_storage(make_error_code(error_code)),
-        m_finalizer(std::move(finalizer)) {}
-
-  ValueOrError(std::error_code error_code, finalizer_type finalizer)
-      : m_has_error(true),
-        m_storage(std::move(error_code)),
-        m_finalizer(std::move(finalizer)) {}
+      : m_has_error(true), m_storage(error_code) {}
 
   ValueOrError()
       : m_has_error(false), m_storage(boost::blank()), m_empty_value(true) {}
@@ -72,19 +53,7 @@ class ValueOrError {
   ValueOrError(U&& value)  // NOLINT
       : m_has_error(false),
         m_storage(std::forward<U>(value)),
-        m_empty_value(false),
-        m_finalizer(default_finalizer) {}
-
-  template <typename U,
-            typename std::enable_if<
-                !std::is_error_code_enum<typename std::decay<U>::type>::value &&
-                !std::is_error_condition_enum<
-                    typename std::decay<U>::type>::value>::type* = nullptr>
-  ValueOrError(U&& value, finalizer_type finalizer)
-      : m_has_error(false),
-        m_storage(std::forward<U>(value)),
-        m_empty_value(false),
-        m_finalizer(std::move(finalizer)) {}
+        m_empty_value(false) {}
 
   ValueOrError(ValueOrError const& other) { copy_construct(other); }
 
@@ -127,8 +96,7 @@ class ValueOrError {
     if (m_has_error) {
       // The error should be handled or explicitly ignored
       if (!m_handled) {
-        // Should not throw
-        if (m_finalizer) m_finalizer();
+        std::abort();
       }
     }
   }
@@ -137,7 +105,6 @@ class ValueOrError {
   void emplace(ArgTypes&&... args) {
     m_storage = value_type{std::forward<ArgTypes>(args)...};
     m_empty_value = false;
-    m_finalizer = default_finalizer;
   }
 
   constexpr explicit operator bool() const noexcept {
@@ -198,7 +165,6 @@ class ValueOrError {
   void copy_construct(ValueOrError<OtherT> const& other) {
     m_has_error = other.m_has_error;
     m_storage = other.m_storage;
-    m_finalizer = other.m_finalizer;
   }
 
   template <typename T1>
@@ -230,7 +196,6 @@ class ValueOrError {
     // dtor and disallow further usage.
     other.m_handled = true;
     other.m_empty_value = true;
-    m_finalizer = std::move(other.m_finalizer);
   }
 
   template <typename OtherT,
@@ -257,18 +222,11 @@ class ValueOrError {
     }
   }
 
-  static void default_finalizer() noexcept {
-    // This is called from the dtor thus should not throw
-    assert(false && "The error should be handled or explicitly ignored");
-  }
-
   mutable bool m_handled = false;
   bool m_has_error;
   storage_type m_storage;
   // TODO(malirod): query storage whether it's empty or not
   bool m_empty_value = true;
-
-  finalizer_type m_finalizer;
 };
 
 template <typename T, typename E>
