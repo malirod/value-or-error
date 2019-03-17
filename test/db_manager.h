@@ -12,6 +12,10 @@ class DBManager {
  public:
   rms::ValueOrError<std::vector<std::string>> get_customers() const;
 
+  rms::ValueOrError<std::string> get_active_customer() const;
+
+  rms::ValueOrError<bool> is_auth(std::string const& customer) const;
+
   void set_current_error(std::error_code error);
 
  private:

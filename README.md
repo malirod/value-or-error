@@ -9,6 +9,9 @@ For details check:
 - [Outcome documentation](http://ned14.github.io/outcome/tutorial/advanced/interop/value-or-error/)
 - [ValueOrError proposal](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0786r0.pdf)
 - [LLVM ErrorOr](http://llvm.org/doxygen/ErrorOr_8h_source.html)
+- [About std::variant](https://www.bfilipek.com/2018/06/variant.html)
+- [Optional-Expected: "and_then" and "map"](https://blog.tartanllama.xyz/optional-expected)
+- [CppCon 2018: Brand & Nash “What Could Possibly Go Wrong?: A Tale of Expectations and Exceptions”](https://www.youtube.com/watch?v=GC4cp4U2f2E)
 
 ## Platform
 

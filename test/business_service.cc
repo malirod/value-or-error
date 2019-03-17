@@ -6,6 +6,10 @@
 rms::BusinessService::BusinessService(DBManager& db_manager)
     : m_db_manager(db_manager) {}
 
+void rms::BusinessService::set_current_error(std::error_code error) {
+  m_current_error = error;
+}
+
 rms::ValueOrError<std::string> rms::BusinessService::get_customer_by_id(
     uint32_t id) const {
   if (m_current_error) {
@@ -26,6 +30,13 @@ rms::ValueOrError<std::string> rms::BusinessService::get_customer_by_id(
   return customers[id];
 }
 
-void rms::BusinessService::set_current_error(std::error_code error) {
-  m_current_error = error;
+rms::ValueOrError<bool> rms::BusinessService::is_current_customer_auth() const {
+  if (m_current_error) {
+    return m_current_error;
+  }
+
+  return m_db_manager.get_active_customer().then(
+      [this](std::string const& customer) {
+        return m_db_manager.is_auth(customer);
+      });
 }

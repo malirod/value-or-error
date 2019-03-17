@@ -5,6 +5,10 @@
 // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0786r0.pdf
 // LLVM ErrorOr: http://llvm.org/doxygen/ErrorOr_8h_source.html
 // About std::variant: https://www.bfilipek.com/2018/06/variant.html
+// Optional-Expected: "and_then" and "map":
+// https://blog.tartanllama.xyz/optional-expected CppCon 2018: Brand & Nash
+// “What Could Possibly Go Wrong?: A Tale of Expectations and Exceptions”:
+// https://www.youtube.com/watch?v=GC4cp4U2f2E
 #pragma once
 
 #include <cassert>
@@ -21,14 +25,19 @@ namespace rms {
 
 using std::make_error_code;
 
+// Trait for checking if a type is a ValueOrError
+template <typename T>
+struct is_value_or_error_impl : std::false_type {};
+template <typename T>
+using is_value_or_error = is_value_or_error_impl<decay_t<T>>;
+
 template <typename T>
 class ValueOrError {
- private:
+ public:
   using value_type = T;
   using storage_type =
       boost::variant<boost::blank, std::error_code, value_type>;
 
- public:
   template <typename E,
             typename std::enable_if<
                 std::is_error_code_enum<E>::value ||
@@ -157,6 +166,26 @@ class ValueOrError {
   friend std::ostream& operator<<(std::ostream& output,
                                   ValueOrError<U> const& obj);
 
+  template <typename F>
+  constexpr auto then(F&& f) & {
+    return then_impl(*this, std::forward<F>(f));
+  }
+
+  template <typename F>
+  constexpr auto then(F&& f) && {
+    return then_impl(std::move(*this), std::forward<F>(f));
+  }
+
+  template <class F>
+  constexpr auto then(F&& f) const& {
+    return then_impl(*this, std::forward<F>(f));
+  }
+
+  template <typename F>
+  constexpr auto then(F&& f) const&& {
+    return then_impl(std::move(*this), std::forward<F>(f));
+  }
+
  private:
   template <typename OtherT>
   friend class ValueOrError;
@@ -198,6 +227,17 @@ class ValueOrError {
     other.m_empty_value = true;
   }
 
+  template <class Exp, class F,
+            class Ret = decltype(invoke(std::declval<F>(),
+                                        *std::declval<Exp>()))>
+  constexpr auto then_impl(Exp&& exp, F&& f) {
+    static_assert(is_value_or_error<Ret>::value,
+                  "F must return an ValueOrError");
+
+    return exp.has_value() ? invoke(std::forward<F>(f), *std::forward<Exp>(exp))
+                           : exp.error();
+  }
+
   template <typename OtherT,
             typename std::enable_if<is_streamable<
                 std::stringstream, OtherT>::value>::type* = nullptr>
@@ -228,6 +268,10 @@ class ValueOrError {
   // TODO(malirod): query storage whether it's empty or not
   bool m_empty_value = true;
 };
+
+// Trait for checking if a type is a ValueOrError
+template <typename T>
+struct is_value_or_error_impl<ValueOrError<T>> : std::true_type {};
 
 template <typename T, typename E>
 typename std::enable_if<std::is_error_code_enum<E>::value ||

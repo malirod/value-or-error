@@ -80,4 +80,27 @@ TEST_CASE("Test for BusinessService", "BusinessService") {
     REQUIRE(!customer_or_error.has_value());
     REQUIRE(customer_or_error.error() == std::errc::device_or_resource_busy);
   }
+
+  SECTION("Check whether current user is auth. No error") {
+    // Arrange
+    // Act
+    auto is_current_customer_auth_or_error =
+        business_service.is_current_customer_auth();
+    // Assert
+    REQUIRE(is_current_customer_auth_or_error.has_value());
+    auto is_current_customer_auth = is_current_customer_auth_or_error.extract();
+    REQUIRE(is_current_customer_auth);
+  }
+
+  SECTION("Check whether current user is auth. Error on DB layer") {
+    // Arrange
+    db_manager.set_current_error(rms::make_error_code(rms::DBError::NoOpenDB));
+    // Act
+    auto is_current_customer_auth_or_error =
+        business_service.is_current_customer_auth();
+    // Assert
+    REQUIRE(!is_current_customer_auth_or_error.has_value());
+    REQUIRE(is_current_customer_auth_or_error.error() ==
+            rms::DBError::NoOpenDB);
+  }
 }

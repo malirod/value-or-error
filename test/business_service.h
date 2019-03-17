@@ -16,6 +16,8 @@ class BusinessService {
 
   rms::ValueOrError<std::string> get_customer_by_id(uint32_t id) const;
 
+  rms::ValueOrError<bool> is_current_customer_auth() const;
+
   void set_current_error(std::error_code error);
 
  private:
