@@ -16,6 +16,8 @@ class DBManager {
 
   rms::ValueOrError<bool> is_auth(std::string const& customer) const;
 
+  rms::ValueOrError<bool> is_admin(std::string const& customer) const;
+
   void set_current_error(std::error_code error);
 
  private:

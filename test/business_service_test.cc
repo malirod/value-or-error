@@ -103,4 +103,58 @@ TEST_CASE("Test for BusinessService", "BusinessService") {
     REQUIRE(is_current_customer_auth_or_error.error() ==
             rms::DBError::NoOpenDB);
   }
+
+  SECTION(
+      "Check whether current user is auth. Standard error from BusinessService "
+      "layer") {
+    // Arrange
+    business_service.set_current_error(
+        std::make_error_code(std::errc::device_or_resource_busy));
+    // Act
+    auto is_current_customer_auth_or_error =
+        business_service.is_current_customer_auth();
+    // Assert
+    REQUIRE(!is_current_customer_auth_or_error.has_value());
+    REQUIRE(is_current_customer_auth_or_error.error() ==
+            std::errc::device_or_resource_busy);
+  }
+
+  SECTION("Check whether current user is admin. No error") {
+    // Arrange
+    // Act
+    auto is_current_customer_admin_or_error =
+        business_service.is_current_customer_admin();
+    // Assert
+    REQUIRE(is_current_customer_admin_or_error.has_value());
+    auto is_current_customer_admin =
+        is_current_customer_admin_or_error.extract();
+    REQUIRE(is_current_customer_admin);
+  }
+
+  SECTION("Check whether current user is admin. Error on DB layer") {
+    // Arrange
+    db_manager.set_current_error(rms::make_error_code(rms::DBError::NoOpenDB));
+    // Act
+    auto is_current_customer_admin_or_error =
+        business_service.is_current_customer_admin();
+    // Assert
+    REQUIRE(!is_current_customer_admin_or_error.has_value());
+    REQUIRE(is_current_customer_admin_or_error.error() ==
+            rms::DBError::NoOpenDB);
+  }
+
+  SECTION(
+      "Check whether current user is admin. Standard error from "
+      "BusinessService layer") {
+    // Arrange
+    business_service.set_current_error(
+        std::make_error_code(std::errc::device_or_resource_busy));
+    // Act
+    auto is_current_customer_admin_or_error =
+        business_service.is_current_customer_admin();
+    // Assert
+    REQUIRE(!is_current_customer_admin_or_error.has_value());
+    REQUIRE(is_current_customer_admin_or_error.error() ==
+            std::errc::device_or_resource_busy);
+  }
 }

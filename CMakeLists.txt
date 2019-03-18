@@ -31,7 +31,8 @@ add_compile_options(-Wall -Wextra -pedantic -Werror)
 set(LIB_NAME ValueOrError)
 set(SRC_LIST
     "src/value_or_error.h"
-    "src/type_traits.h")
+    "src/type_traits.h"
+    "src/try.h")
 
 add_library(${LIB_NAME} ${SRC_LIST})
 add_library(rms::${LIB_NAME} ALIAS ${LIB_NAME})

@@ -27,5 +27,13 @@ rms::ValueOrError<bool> rms::DBManager::is_auth(
   if (m_current_error) {
     return m_current_error;
   }
-  return customer == "John" ? true : false;
+  return customer == "John";
+}
+
+rms::ValueOrError<bool> rms::DBManager::is_admin(
+    std::string const& customer) const {
+  if (m_current_error) {
+    return m_current_error;
+  }
+  return customer == "Steve";
 }

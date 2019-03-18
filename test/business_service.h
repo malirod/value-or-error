@@ -18,6 +18,8 @@ class BusinessService {
 
   rms::ValueOrError<bool> is_current_customer_auth() const;
 
+  rms::ValueOrError<bool> is_current_customer_admin() const;
+
   void set_current_error(std::error_code error);
 
  private:

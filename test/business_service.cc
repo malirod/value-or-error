@@ -2,6 +2,7 @@
 #include "business_service.h"
 #include "business_service_error.h"
 #include "db_manager.h"
+#include "try.h"
 
 rms::BusinessService::BusinessService(DBManager& db_manager)
     : m_db_manager(db_manager) {}
@@ -39,4 +40,15 @@ rms::ValueOrError<bool> rms::BusinessService::is_current_customer_auth() const {
       [this](std::string const& customer) {
         return m_db_manager.is_auth(customer);
       });
+}
+
+rms::ValueOrError<bool> rms::BusinessService::is_current_customer_admin()
+    const {
+  if (m_current_error) {
+    return m_current_error;
+  }
+
+  VOE_TRY_EXTRACT(active_customer, m_db_manager.get_active_customer());
+
+  return m_db_manager.is_auth(active_customer);
 }

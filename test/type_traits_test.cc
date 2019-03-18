@@ -17,15 +17,10 @@ class Bar {
 template <typename T>
 class Wrapper {
  public:
-  template <typename U>
-  Wrapper(U&& value) : value(std::forward<U>(value)) {}
+  explicit Wrapper(T value) : m_value(std::move(value)) {}
 
-  template <typename U>
-  friend std::ostream& operator<<(std::ostream& output, const Wrapper<U>& obj);
+  const T& get() const { return m_value; }
 
-  const T& get() const { return value; }
-
- private:
   template <typename OtherT,
             typename std::enable_if<rms::is_streamable<
                 std::stringstream, OtherT>::value>::type* = nullptr>
@@ -40,7 +35,8 @@ class Wrapper {
     os << "<value>";
   }
 
-  T value;
+ private:
+  T m_value;
 };
 
 template <typename U>
@@ -99,19 +95,19 @@ TEST_CASE("Non Streamable Wrapper", "Type Traits") {
 }
 
 TEST_CASE("Functional wrapper", "Type Traits") {
-  auto lambdaNoArgs = []() { return long(10); };
+  auto lambdaNoArgs = []() { return int64_t(10); };
   auto lambda = [](int i, const Wrapper<double>& bar) {
-    return long(i * 10 * bar.get());
+    return int64_t(i * 10 * bar.get());
   };
 
   using LambdaNoArgs = rms::function_traits<decltype(lambdaNoArgs)>;
   using Traits = rms::function_traits<decltype(lambda)>;
 
-  static_assert(std::is_same<long, LambdaNoArgs::return_type>::value,
+  static_assert(std::is_same<int64_t, LambdaNoArgs::return_type>::value,
                 "Wrong result type");
   static_assert(LambdaNoArgs::args_count == 0, "Wrong argument count");
 
-  static_assert(std::is_same<long, Traits::return_type>::value,
+  static_assert(std::is_same<int64_t, Traits::return_type>::value,
                 "Wrong result type");
   static_assert(std::is_same<int, Traits::arg<0>::type>::value,
                 "Wrong first argument type");
