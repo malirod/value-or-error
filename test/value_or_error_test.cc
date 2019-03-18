@@ -130,6 +130,7 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
       REQUIRE(result.has_value());
       REQUIRE(DefaultValue == result.value().get_data());
       REQUIRE(DefaultValue == result->get_data());
+      REQUIRE(DefaultValue == (*result).get_data());
     }
 
     REQUIRE(1u == Foo::CTorCnt);  // Was created explicitly
@@ -429,45 +430,63 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
     }
   }
 
-  /*
-  SECTION("Custom finalizer for unhandled error") {
-    bool error_is_not_handled = false;
-    auto action = [&]() {
-      auto finalizer = [&]() { error_is_not_handled = true; };
-      auto result =
-          ErrorOrFoo(std::make_error_code(std::errc::no_such_file_or_directory),
-                     std::move(finalizer));
+  SECTION("Then: handling by T. Sequential positive calls.") {
+    // Arrange
+    auto action1 = []() { return ErrorOrFoo{Foo{DefaultValue}}; };
+
+    auto action2 = [](Foo const& foo) {
+      return ErrorOrFoo{Foo{foo.get_data() + 1}};
     };
-    action();
-    REQUIRE(error_is_not_handled);
+    auto action3 = [](Foo const& foo) {
+      return ErrorOrFoo(Foo{foo.get_data() + 2});
+    };
+
+    // Act
+    auto result = action1().then(action2).then(action3);
+
+    // Assert
+    REQUIRE(result.has_value());
+    REQUIRE(result.value().get_data() == DefaultValue + 3);
   }
 
-  SECTION("Unhandled error unignored") {
-    bool error_is_not_handled = false;
-    auto action = [&]() {
-      auto finalizer = [&]() { error_is_not_handled = true; };
-      auto result =
-          ErrorOrFoo(std::make_error_code(std::errc::no_such_file_or_directory),
-                     std::move(finalizer));
-      if (!result) {
-        REQUIRE(std::errc::no_such_file_or_directory == result.error());
-      } else {
-        REQUIRE(false);  // not expected to go this way
-      }
-      result.unignore();
+  SECTION("Then: handling by T. Second fails.") {
+    // Arrange
+    auto action1 = []() { return ErrorOrFoo{Foo{DefaultValue}}; };
+
+    auto action2 = [](Foo const&) {
+      return ErrorOrFoo{std::make_error_code(std::errc::invalid_argument)};
     };
-    action();
-    REQUIRE(error_is_not_handled);
+    auto action3 = [](Foo const& foo) {
+      return ErrorOrFoo(Foo{foo.get_data() + 2});
+    };
+
+    // Act
+    auto result = action1().then(action2).then(action3);
+
+    // Assert
+    REQUIRE(!result.has_value());
+    REQUIRE(result.error() ==
+            std::make_error_code(std::errc::invalid_argument));
   }
 
-  SECTION("Value can be ignored") {
-    bool error_is_not_handled = false;
-    auto action = [&]() {
-      auto finalizer = [&]() { error_is_not_handled = true; };
-      auto result = ErrorOrFoo(Foo(DefaultValue), std::move(finalizer));
+  SECTION("Then: handling by ValueOrError. Sequential calls.") {
+    // Arrange
+    auto action1 = []() { return ErrorOrFoo{Foo{DefaultValue}}; };
+
+    auto action2 = [](ErrorOrFoo const& error_or_foo) {
+      REQUIRE(error_or_foo.has_value());
+      return ErrorOrFoo{Foo{(*error_or_foo).get_data() + 1}};
     };
-    action();
-    REQUIRE(!error_is_not_handled);
+    auto action3 = [](ErrorOrFoo const& error_or_foo) {
+      REQUIRE(error_or_foo.has_value());
+      return ErrorOrFoo{Foo{(*error_or_foo).get_data() + 2}};
+    };
+
+    // Act
+    auto result = action1().then(action2).then(action3);
+
+    // Assert
+    REQUIRE(result.has_value());
+    REQUIRE(result.value().get_data() == DefaultValue + 3);
   }
-  */
 }

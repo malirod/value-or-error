@@ -31,7 +31,8 @@ add_compile_options(-Wall -Wextra -pedantic -Werror)
 set(LIB_NAME ValueOrError)
 set(SRC_LIST
     "src/value_or_error.h"
-    "src/type_traits.h")
+    "src/type_traits.h"
+    "src/try.h")
 
 add_library(${LIB_NAME} ${SRC_LIST})
 add_library(rms::${LIB_NAME} ALIAS ${LIB_NAME})
@@ -63,7 +64,8 @@ if (BUILD_TESTING)
         "test/business_service.cc"
         "test/business_service_test.cc"
         "test/business_service_error.h"
-        "test/business_service_error.cc")
+        "test/business_service_error.cc"
+        "test/type_traits_test.cc")
 
     add_library(${TEST_LIB_NAME} OBJECT ${TEST_SRC_LIST})
     add_library(rms::${TEST_LIB_NAME} ALIAS ${TEST_LIB_NAME})
