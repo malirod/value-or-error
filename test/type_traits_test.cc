@@ -11,7 +11,7 @@ class Foo {};
 
 class Bar {
  public:
-  void serialize(std::ostream& os) const { os << "this-is-bar"; }
+  static void serialize(std::ostream& os) { os << "this-is-bar"; }
 };
 
 template <typename T>
@@ -31,7 +31,7 @@ class Wrapper {
   template <typename OtherT,
             typename std::enable_if<!rms::is_streamable<
                 std::stringstream, OtherT>::value>::type* = nullptr>
-  void to_stream(std::ostream& os) const {
+  static void to_stream(std::ostream& os) {
     os << "<value>";
   }
 

@@ -18,7 +18,7 @@ template <typename S, typename T>
 class is_serializable {
  private:
   template <typename OtherS, typename OtherT>
-  static auto test(int)
+  static auto test(int)  // NOLINT
       -> decltype(std::declval<OtherT>().serialize(std::declval<OtherS &>()),
                   std::true_type());
 
@@ -53,6 +53,7 @@ template <typename ClassType, typename ReturnType, typename... Args>
 struct function_traits<ReturnType (ClassType::*)(Args...) const> {
   typedef ReturnType return_type;
 
+  // cppcheck-suppress unusedStructMember
   constexpr static const size_t args_count = sizeof...(Args);
 
   template <size_t N>
@@ -71,6 +72,7 @@ using enable_if_t = typename std::enable_if<E, T>::type;
 
 // std::invoke from C++17
 // https://stackoverflow.com/questions/38288042/c11-14-invoke-workaround
+/*
 template <typename Fn, typename... Args,
           typename = enable_if_t<std::is_member_pointer<decay_t<Fn>>{}>,
           int = 0>
@@ -79,6 +81,7 @@ constexpr auto invoke(Fn &&f, Args &&... args) noexcept(
     -> decltype(std::mem_fn(f)(std::forward<Args>(args)...)) {
   return std::mem_fn(f)(std::forward<Args>(args)...);
 }
+*/
 
 template <typename Fn, typename... Args,
           typename = enable_if_t<!std::is_member_pointer<decay_t<Fn>>{}>>

@@ -18,7 +18,6 @@ rms::ValueOrError<std::string> rms::DBManager::get_active_customer() const {
   if (m_current_error) {
     return m_current_error;
   }
-  std::vector<std::string> result = {"John", "Steve"};
   return "John";
 }
 
