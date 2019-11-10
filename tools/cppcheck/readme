@@ -1,19 +1,14 @@
 source: https://github.com/danmar/cppcheck
-version: 1.87
+version: 1.89
 build cmd:
-sudo apt install libpcre3-dev
+sudo apt install -y libpcre3-dev dos2unix
 make SRCDIR=build CFGDIR=cfg HAVE_RULES=yes CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function"
 
 changed:
 fixed odd whitespaces in rules with the following commands
 ```
-dos2unix
-sed -i 's/[ \t]*$//' tools/cppcheck/cfg/std.cfg
-sed -i 's/[ \t]*$//' tools/cppcheck/cfg/windows.cfg
-sed -i 's/[ \t]*$//' tools/cppcheck/cfg/bsd.cfg
-sed -i 's/[ \t]*$//' tools/cppcheck/cfg/gnu.cfg
-sed -i 's/[ \t]*$//' tools/cppcheck/cfg/posix.cfg
-sed -i 's/[ \t]*$//' tools/cppcheck/cfg/wxwidgets.cfg
+find cfg | xargs dos2unix
+find cfg -exec sed -i "s/[ \t]*$//" {} \;
 ```
 
 usage:
