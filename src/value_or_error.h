@@ -11,13 +11,12 @@
 // https://www.youtube.com/watch?v=GC4cp4U2f2E
 #pragma once
 
+#include <boost/variant.hpp>
 #include <cassert>
 #include <functional>
 #include <ostream>
 #include <system_error>
 #include <type_traits>
-
-#include <boost/variant.hpp>
 
 #include "type_traits.h"
 

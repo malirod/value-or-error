@@ -1,9 +1,8 @@
 // Copyright [2019] <Malinovsky Rodion> (rodionmalino@gmail.com)
 #include "value_or_error.h"
 
-#include <sstream>
-
 #include <catch2/catch.hpp>
+#include <sstream>
 
 namespace {
 
@@ -33,6 +32,9 @@ class Foo {
   }
 
   Foo& operator=(const Foo& rhs) {
+    if (this == &rhs) {
+      return *this;
+    }
     m_data = rhs.m_data;
     ++CopyAssignCnt;
     return *this;
@@ -95,12 +97,12 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
       REQUIRE(result.error() == std::errc::no_such_file_or_directory);
     }
 
-    REQUIRE(0u == Foo::CTorCnt);
-    REQUIRE(0u == Foo::CopyCTorCnt);
-    REQUIRE(0u == Foo::MoveCTorCnt);
-    REQUIRE(0u == Foo::MoveAssignCnt);
-    REQUIRE(0u == Foo::CopyAssignCnt);
-    REQUIRE(0u == Foo::DTorCnt);
+    REQUIRE(0U == Foo::CTorCnt);
+    REQUIRE(0U == Foo::CopyCTorCnt);
+    REQUIRE(0U == Foo::MoveCTorCnt);
+    REQUIRE(0U == Foo::MoveAssignCnt);
+    REQUIRE(0U == Foo::CopyAssignCnt);
+    REQUIRE(0U == Foo::DTorCnt);
   }
 
   SECTION("Implicit error code compare") {
@@ -113,12 +115,12 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
       REQUIRE(result == std::errc::no_such_file_or_directory);
     }
 
-    REQUIRE(0u == Foo::CTorCnt);
-    REQUIRE(0u == Foo::CopyCTorCnt);
-    REQUIRE(0u == Foo::MoveCTorCnt);
-    REQUIRE(0u == Foo::MoveAssignCnt);
-    REQUIRE(0u == Foo::CopyAssignCnt);
-    REQUIRE(0u == Foo::DTorCnt);
+    REQUIRE(0U == Foo::CTorCnt);
+    REQUIRE(0U == Foo::CopyCTorCnt);
+    REQUIRE(0U == Foo::MoveCTorCnt);
+    REQUIRE(0U == Foo::MoveAssignCnt);
+    REQUIRE(0U == Foo::CopyAssignCnt);
+    REQUIRE(0U == Foo::DTorCnt);
   }
 
   SECTION("Create with value") {
@@ -133,12 +135,12 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
       REQUIRE(DefaultValue == (*result).get_data());
     }
 
-    REQUIRE(1u == Foo::CTorCnt);  // Was created explicitly
-    REQUIRE(0u == Foo::CopyCTorCnt);
-    REQUIRE(1u == Foo::MoveCTorCnt);  // Was created implicitly
-    REQUIRE(0u == Foo::MoveAssignCnt);
-    REQUIRE(0u == Foo::CopyAssignCnt);
-    REQUIRE(2u == Foo::DTorCnt);  // All were destroyed
+    REQUIRE(1U == Foo::CTorCnt);  // Was created explicitly
+    REQUIRE(0U == Foo::CopyCTorCnt);
+    REQUIRE(1U == Foo::MoveCTorCnt);  // Was created implicitly
+    REQUIRE(0U == Foo::MoveAssignCnt);
+    REQUIRE(0U == Foo::CopyAssignCnt);
+    REQUIRE(2U == Foo::DTorCnt);  // All were destroyed
   }
 
   SECTION("Create with help of emplace") {
@@ -154,12 +156,12 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
       REQUIRE(DefaultValue == result->get_data());
     }
 
-    REQUIRE(1u == Foo::CTorCnt);
-    REQUIRE(0u == Foo::CopyCTorCnt);
-    REQUIRE(2u == Foo::MoveCTorCnt);
-    REQUIRE(0u == Foo::MoveAssignCnt);
-    REQUIRE(0u == Foo::CopyAssignCnt);
-    REQUIRE(3u == Foo::DTorCnt);
+    REQUIRE(1U == Foo::CTorCnt);
+    REQUIRE(0U == Foo::CopyCTorCnt);
+    REQUIRE(2U == Foo::MoveCTorCnt);
+    REQUIRE(0U == Foo::MoveAssignCnt);
+    REQUIRE(0U == Foo::CopyAssignCnt);
+    REQUIRE(3U == Foo::DTorCnt);
   }
 
   SECTION("Implicit create") {
@@ -182,12 +184,12 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
       REQUIRE(!result.error());
       REQUIRE(!result.has_value());
 
-      REQUIRE(0u == Foo::CTorCnt);
-      REQUIRE(0u == Foo::CopyCTorCnt);
-      REQUIRE(0u == Foo::MoveCTorCnt);
-      REQUIRE(0u == Foo::MoveAssignCnt);
-      REQUIRE(0u == Foo::CopyAssignCnt);
-      REQUIRE(0u == Foo::DTorCnt);
+      REQUIRE(0U == Foo::CTorCnt);
+      REQUIRE(0U == Foo::CopyCTorCnt);
+      REQUIRE(0U == Foo::MoveCTorCnt);
+      REQUIRE(0U == Foo::MoveAssignCnt);
+      REQUIRE(0U == Foo::CopyAssignCnt);
+      REQUIRE(0U == Foo::DTorCnt);
 
       result = Foo(DefaultValue);
 
@@ -196,12 +198,12 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
       REQUIRE(DefaultValue == result->get_data());
     }
 
-    REQUIRE(1u == Foo::CTorCnt);  // Was emplaced explicitly
-    REQUIRE(0u == Foo::CopyCTorCnt);
-    REQUIRE(2u == Foo::MoveCTorCnt);
-    REQUIRE(0u == Foo::MoveAssignCnt);
-    REQUIRE(0u == Foo::CopyAssignCnt);
-    REQUIRE(3u == Foo::DTorCnt);  // All were destroyed
+    REQUIRE(1U == Foo::CTorCnt);  // Was emplaced explicitly
+    REQUIRE(0U == Foo::CopyCTorCnt);
+    REQUIRE(2U == Foo::MoveCTorCnt);
+    REQUIRE(0U == Foo::MoveAssignCnt);
+    REQUIRE(0U == Foo::CopyAssignCnt);
+    REQUIRE(3U == Foo::DTorCnt);  // All were destroyed
   }
 
   SECTION("Create with unique value") {
@@ -214,20 +216,20 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
       REQUIRE(DefaultValue == result.value()->get_data());
     }
 
-    REQUIRE(1u == Foo::CTorCnt);
-    REQUIRE(0u == Foo::CopyCTorCnt);
-    REQUIRE(0u == Foo::MoveCTorCnt);
-    REQUIRE(0u == Foo::MoveAssignCnt);
-    REQUIRE(0u == Foo::CopyAssignCnt);
-    REQUIRE(1u == Foo::DTorCnt);
+    REQUIRE(1U == Foo::CTorCnt);
+    REQUIRE(0U == Foo::CopyCTorCnt);
+    REQUIRE(0U == Foo::MoveCTorCnt);
+    REQUIRE(0U == Foo::MoveAssignCnt);
+    REQUIRE(0U == Foo::CopyAssignCnt);
+    REQUIRE(1U == Foo::DTorCnt);
   }
 
   SECTION("Create with unique values") {
-    std::size_t const cnt = 10u;
+    std::size_t const cnt = 10U;
     {
       UniqueFoos foos;
       foos.reserve(cnt);
-      for (std::size_t i = 0u; i < cnt; ++i) {
+      for (std::size_t i = 0U; i < cnt; ++i) {
         auto item = std::make_unique<Foo>(DefaultValue);
         foos.emplace_back(std::move(item));
       }
@@ -240,12 +242,12 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
       }
     }
 
-    REQUIRE(1u * cnt == Foo::CTorCnt);
-    REQUIRE(0u == Foo::CopyCTorCnt);
-    REQUIRE(0u == Foo::MoveCTorCnt);
-    REQUIRE(0u == Foo::MoveAssignCnt);
-    REQUIRE(0u == Foo::CopyAssignCnt);
-    REQUIRE(1u * cnt == Foo::DTorCnt);
+    REQUIRE(1U * cnt == Foo::CTorCnt);
+    REQUIRE(0U == Foo::CopyCTorCnt);
+    REQUIRE(0U == Foo::MoveCTorCnt);
+    REQUIRE(0U == Foo::MoveAssignCnt);
+    REQUIRE(0U == Foo::CopyAssignCnt);
+    REQUIRE(1U * cnt == Foo::DTorCnt);
   }
 
   SECTION("Extract unique value") {
@@ -262,12 +264,12 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
       REQUIRE(DefaultValue == another->get_data());
     }
 
-    REQUIRE(1u == Foo::CTorCnt);
-    REQUIRE(0u == Foo::CopyCTorCnt);
-    REQUIRE(0u == Foo::MoveCTorCnt);
-    REQUIRE(0u == Foo::MoveAssignCnt);
-    REQUIRE(0u == Foo::CopyAssignCnt);
-    REQUIRE(1u == Foo::DTorCnt);
+    REQUIRE(1U == Foo::CTorCnt);
+    REQUIRE(0U == Foo::CopyCTorCnt);
+    REQUIRE(0U == Foo::MoveCTorCnt);
+    REQUIRE(0U == Foo::MoveAssignCnt);
+    REQUIRE(0U == Foo::CopyAssignCnt);
+    REQUIRE(1U == Foo::DTorCnt);
   }
 
   SECTION("Error or bool") {
@@ -372,12 +374,12 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
       REQUIRE(!result.has_value());
     }
 
-    REQUIRE(1u == Foo::CTorCnt);
-    REQUIRE(0u == Foo::CopyCTorCnt);
-    REQUIRE(2u == Foo::MoveCTorCnt);
-    REQUIRE(0u == Foo::MoveAssignCnt);
-    REQUIRE(0u == Foo::CopyAssignCnt);
-    REQUIRE(3u == Foo::DTorCnt);
+    REQUIRE(1U == Foo::CTorCnt);
+    REQUIRE(0U == Foo::CopyCTorCnt);
+    REQUIRE(2U == Foo::MoveCTorCnt);
+    REQUIRE(0U == Foo::MoveAssignCnt);
+    REQUIRE(0U == Foo::CopyAssignCnt);
+    REQUIRE(3U == Foo::DTorCnt);
   }
 
   SECTION("Extract shared value") {
@@ -393,12 +395,12 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
       REQUIRE(!result.has_value());
     }
 
-    REQUIRE(1u == Foo::CTorCnt);
-    REQUIRE(0u == Foo::CopyCTorCnt);
-    REQUIRE(0u == Foo::MoveCTorCnt);
-    REQUIRE(0u == Foo::MoveAssignCnt);
-    REQUIRE(0u == Foo::CopyAssignCnt);
-    REQUIRE(1u == Foo::DTorCnt);
+    REQUIRE(1U == Foo::CTorCnt);
+    REQUIRE(0U == Foo::CopyCTorCnt);
+    REQUIRE(0U == Foo::MoveCTorCnt);
+    REQUIRE(0U == Foo::MoveAssignCnt);
+    REQUIRE(0U == Foo::CopyAssignCnt);
+    REQUIRE(1U == Foo::DTorCnt);
   }
 
   SECTION("UnInitialized Value") {
@@ -453,7 +455,7 @@ TEST_CASE("Tests of ValueOrError class", "ValueOrError") {
     // Arrange
     auto action1 = []() { return ErrorOrFoo{Foo{DefaultValue}}; };
 
-    auto action2 = [](Foo const&) {
+    auto action2 = [](Foo const& /*unused*/) {
       return ErrorOrFoo{std::make_error_code(std::errc::invalid_argument)};
     };
     auto action3 = [](Foo const& foo) {

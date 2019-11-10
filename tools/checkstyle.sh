@@ -39,10 +39,7 @@ echo -e "$TEXT_INFO" "Checking cpp style with clang-format" "$TEXT_DEFAULT"
 # Use update-alternatives to set default clang.
 
 # set path to clang-format binary
-CLANG_FORMAT=$(command -v clang-format-7)
-# Verify clang-format. Note: Different versions might produce different formatting for the same config
-CLANG_FORMAT_REQUIRED_VERSION=7.
-CLANG_FORMAT_CURRENT_VERSION=$($CLANG_FORMAT -version)
+CLANG_FORMAT=$(command -v clang-format)
 
 # remove any older patches from previous commits. Set to true or false.
 DELETE_OLD_PATCHES=true
@@ -53,12 +50,6 @@ if [ ! -x "$CLANG_FORMAT" ] ; then
     echo -e "Set the correct path in $(canonicalize_filename "$0")."
     echo -e "$TEXT_DEFAULT"
     exit 1
-fi
-
-if [[ $CLANG_FORMAT_CURRENT_VERSION != *$CLANG_FORMAT_REQUIRED_VERSION* ]]
-then
-  echo -e "$TEXT_ERROR" "Wrong version of the clang-format. Required: $CLANG_FORMAT_REQUIRED_VERSION. Got: $CLANG_FORMAT_CURRENT_VERSION" "$TEXT_DEFAULT"
-  exit 1
 fi
 
 # create a random filename to store our generated patch

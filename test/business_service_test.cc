@@ -1,10 +1,11 @@
 // Copyright [2019] <Malinovsky Rodion> (rodionmalino@gmail.com)
 #include "business_service.h"
+
+#include <catch2/catch.hpp>
+
 #include "business_service_error.h"
 #include "db_error.h"
 #include "db_manager.h"
-
-#include <catch2/catch.hpp>
 
 TEST_CASE("Test for BusinessService", "BusinessService") {
   // Global Arrange
@@ -14,7 +15,8 @@ TEST_CASE("Test for BusinessService", "BusinessService") {
   SECTION("Get customer by id without errors") {
     // Arrange
     // Act
-    auto customer_or_error = business_service.get_customer_by_id(1u);
+    constexpr uint32_t arbitrary_id = 1U;
+    auto customer_or_error = business_service.get_customer_by_id(arbitrary_id);
     // Assert
     REQUIRE(customer_or_error.has_value());
     auto customer = customer_or_error.extract();
@@ -28,7 +30,8 @@ TEST_CASE("Test for BusinessService", "BusinessService") {
     business_service.set_current_error(
         rms::make_error_code(rms::BusinessServiceError::OperationCanceled));
     // Act
-    auto customer_or_error = business_service.get_customer_by_id(1u);
+    constexpr uint32_t arbitrary_id = 1U;
+    auto customer_or_error = business_service.get_customer_by_id(arbitrary_id);
     // Assert
     REQUIRE(!customer_or_error.has_value());
     REQUIRE(customer_or_error.error() ==
@@ -40,7 +43,8 @@ TEST_CASE("Test for BusinessService", "BusinessService") {
       "layer") {
     // Arrange
     // Act
-    auto customer_or_error = business_service.get_customer_by_id(8u);
+    constexpr uint32_t arbitrary_id = 8U;
+    auto customer_or_error = business_service.get_customer_by_id(arbitrary_id);
     // Assert
     REQUIRE(!customer_or_error.has_value());
     REQUIRE(customer_or_error.error() ==
@@ -54,7 +58,8 @@ TEST_CASE("Test for BusinessService", "BusinessService") {
     business_service.set_current_error(
         std::make_error_code(std::errc::device_or_resource_busy));
     // Act
-    auto customer_or_error = business_service.get_customer_by_id(8u);
+    constexpr uint32_t arbitrary_id = 8U;
+    auto customer_or_error = business_service.get_customer_by_id(arbitrary_id);
     // Assert
     REQUIRE(!customer_or_error.has_value());
     REQUIRE(customer_or_error.error() == std::errc::device_or_resource_busy);
@@ -64,7 +69,7 @@ TEST_CASE("Test for BusinessService", "BusinessService") {
     // Arrange
     db_manager.set_current_error(rms::make_error_code(rms::DBError::NoOpenDB));
     // Act
-    auto customer_or_error = business_service.get_customer_by_id(1u);
+    auto customer_or_error = business_service.get_customer_by_id(1U);
     // Assert
     REQUIRE(!customer_or_error.has_value());
     REQUIRE(customer_or_error.error() == rms::DBError::NoOpenDB);
@@ -75,7 +80,7 @@ TEST_CASE("Test for BusinessService", "BusinessService") {
     db_manager.set_current_error(
         std::make_error_code(std::errc::device_or_resource_busy));
     // Act
-    auto customer_or_error = business_service.get_customer_by_id(1u);
+    auto customer_or_error = business_service.get_customer_by_id(1U);
     // Assert
     REQUIRE(!customer_or_error.has_value());
     REQUIRE(customer_or_error.error() == std::errc::device_or_resource_busy);

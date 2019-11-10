@@ -1,8 +1,9 @@
 // Copyright [2019] <Malinovsky Rodion> (rodionmalino@gmail.com)
 #include "db_error.h"
-#include "enum_util.h"
 
 #include <catch2/catch.hpp>
+
+#include "enum_util.h"
 
 using rms::DBError;
 using rms::util::enum_util::EnumToString;

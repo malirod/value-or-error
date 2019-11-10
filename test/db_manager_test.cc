@@ -1,15 +1,16 @@
 // Copyright [2019] <Malinovsky Rodion> (rodionmalino@gmail.com)
 #include "db_manager.h"
-#include "db_error.h"
 
 #include <catch2/catch.hpp>
+
+#include "db_error.h"
 
 TEST_CASE("Get customers without error", "DBManager") {
   const rms::DBManager db_manager;
   auto customers_or_error = db_manager.get_customers();
   REQUIRE(customers_or_error.has_value());
   const auto customers = customers_or_error.extract();
-  REQUIRE(customers.size() == 2u);
+  REQUIRE(customers.size() == 2U);
   REQUIRE(customers[0] == "John");
   REQUIRE(customers[1] == "Steve");
 }

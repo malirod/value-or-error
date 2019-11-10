@@ -1,9 +1,8 @@
 // Copyright [2019] <Malinovsky Rodion> (rodionmalino@gmail.com)
 #include "type_traits.h"
 
-#include <sstream>
-
 #include <catch2/catch.hpp>
+#include <sstream>
 
 namespace {
 
@@ -95,9 +94,10 @@ TEST_CASE("Non Streamable Wrapper", "Type Traits") {
 }
 
 TEST_CASE("Functional wrapper", "Type Traits") {
-  auto lambdaNoArgs = []() { return int64_t(10); };
+  const int64_t arbitrary_int = 10;
+  auto lambdaNoArgs = []() { return arbitrary_int; };
   auto lambda = [](int i, const Wrapper<double>& bar) {
-    return int64_t(i * 10 * bar.get());
+    return static_cast<double>(i * arbitrary_int) * bar.get();
   };
 
   using LambdaNoArgs = rms::function_traits<decltype(lambdaNoArgs)>;
@@ -107,7 +107,7 @@ TEST_CASE("Functional wrapper", "Type Traits") {
                 "Wrong result type");
   static_assert(LambdaNoArgs::args_count == 0, "Wrong argument count");
 
-  static_assert(std::is_same<int64_t, Traits::return_type>::value,
+  static_assert(std::is_same<double, Traits::return_type>::value,
                 "Wrong result type");
   static_assert(std::is_same<int, Traits::arg<0>::type>::value,
                 "Wrong first argument type");

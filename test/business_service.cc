@@ -1,5 +1,6 @@
 // Copyright [2019] <Malinovsky Rodion> (rodionmalino@gmail.com)
 #include "business_service.h"
+
 #include "business_service_error.h"
 #include "db_manager.h"
 #include "try.h"
