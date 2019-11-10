@@ -1,9 +1,8 @@
 // Copyright [2019] <Malinovsky Rodion> (rodionmalino@gmail.com)
 #include "enum_util.h"
 
-#include <sstream>
-
 #include <catch2/catch.hpp>
+#include <sstream>
 
 namespace {
 

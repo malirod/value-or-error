@@ -11,7 +11,17 @@ project(ValueOrError VERSION 1.0 LANGUAGES CXX C)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Manage dependencies with Conan
-include(SetupConan)
+include(Conan)
+conan_check(VERSION 1.20.0 REQUIRED)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}")
+conan_add_remote(NAME bincrafters INDEX 1
+            URL https://api.bintray.com/conan/bincrafters/public-conan)
+conan_add_remote(NAME catchorg INDEX 2
+            URL https://api.bintray.com/conan/catchorg/Catch2)
+conan_cmake_run(REQUIRES Catch2/2.6.0@catchorg/stable boost_variant/1.69.0@bincrafters/stable
+                BASIC_SETUP CMAKE_TARGETS
+                GENERATORS cmake_find_package
+                BUILD missing)
 
 find_package(boost_variant REQUIRED)
 

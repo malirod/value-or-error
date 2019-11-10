@@ -15,7 +15,7 @@ For details check:
 
 ## Platform
 
-Ubuntu 18.10: Clang 7.0, GCC 8.2, Cmake 3.12, Conan
+Ubuntu 19.10: Clang 9, GCC 9, Cmake 3.13, Conan
 
 C++14 Standard is used.
 
@@ -46,12 +46,6 @@ Install conan with
 `sudo -H pip install conan`
 
 CMake will try to automatically setup dependencies.
-
-Add additional repositories to conan:
-
-`conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan`
-
-`conan remote add catchorg https://api.bintray.com/conan/catchorg/Catch2`
 
 Cmake will automatically check required dependencies and setup them taking into account current compiler (clang or gcc).
 
@@ -155,4 +149,4 @@ make clang-tidy
 
 ### Documentation
 
-Code contains doxygen. To generate html documentation run command `make doc`. Output will be in `<build dir>\doc\html`
+Code contains doxygen. To generate html documentation run command `make doc`. Output will be in `<build dir>\doc\html

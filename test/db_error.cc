@@ -1,5 +1,6 @@
 // Copyright [2019] <Malinovsky Rodion> (rodionmalino@gmail.com)
 #include "db_error.h"
+
 #include "enum_util.h"
 
 using rms::DBError;

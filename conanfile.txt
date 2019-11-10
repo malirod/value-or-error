@@ -1,7 +1,0 @@
-[requires]
-Catch2/2.6.0@catchorg/stable
-boost_variant/1.69.0@bincrafters/stable
-
-[generators]
-cmake_find_package
-cmake_paths
